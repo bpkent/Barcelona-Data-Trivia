@@ -2,13 +2,16 @@
 Utils.
 """
 
-# %%
 import os
-from dotenv import load_dotenv
-from atproto import Client, client_utils, models
 
+import requests
+from atproto import Client, client_utils, models
+from dotenv import load_dotenv
 
 load_dotenv()
+
+
+data_api = "https://opendata-ajuntament.barcelona.cat/data/api/action"
 
 
 def publish_bsky_post(text: str, link_url: str, link_title: str = "", language="ca"):
@@ -35,3 +38,30 @@ def publish_bsky_post(text: str, link_url: str, link_title: str = "", language="
 
     response = client.send_post(text=full_text, embed=external_embed, langs=[language])
     return response
+
+
+def get_dataset_metadata(dataset: str) -> list:
+    """Get all metadata for a dataset, including the resources."""
+
+    url = f"{data_api}/package_show"
+    params = {"id": dataset}
+    response = requests.get(url, params=params)
+
+    if response.json()["success"]:
+        return response.json()["result"]
+
+    return []
+
+
+def dataset_title(dataset_meta: dict) -> str:
+    """From dataset metadata, extract the website title."""
+    return dataset_meta["title_translated"]["ca"]
+
+
+def query_csv_resource(sql_query: str):
+    """Query a CSV resource with SQL"""
+
+    url = f"{data_api}/datastore_search_sql"
+    params = {"sql": sql_query}
+    response = requests.get(url, params=params)
+    return response.json()
