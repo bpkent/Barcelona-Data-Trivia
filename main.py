@@ -4,15 +4,16 @@ Main script.
 
 # %%
 from utils import (
-    get_dataset_metadata,
     dataset_title,
-    query_csv_resource,
+    get_dataset_metadata,
     publish_bsky_post,
+    query_csv_resource,
+    write_factoid,
 )
 
 ## 1. Choose a dataset.
 # %%
-dataset = "pad_m_nom_sexe"
+dataset = "cens-locals-planta-baixa-act-economica"
 
 meta = get_dataset_metadata(dataset)
 
@@ -28,24 +29,29 @@ table_id = resources[0]["id"]
 
 ## 2. Come up with an interesting question.
 # %%
-question = "What are the top 3 most common men's names in Barcelona?"
+question = "Which neighborhoods of Barcelona have the most pharmacies?"
 
 
 ## 3. Translate to SQL
 # %%
-sql = f'SELECT "NOM" FROM "{table_id}" WHERE "SEXE" = 2 ORDER BY "Valor_Freq" DESC LIMIT 3'
+sql = (
+    f"""SELECT "Nom_Barri", COUNT(*) FROM "{table_id}" WHERE "Nom_Principal_Activitat" = 'Actiu' """
+    "GROUP BY 1 "
+    "ORDER BY 2 DESC "
+    "LIMIT 3"
+)
 
 
 ## 4. Execute the SQL against the API.
 # %%
 raw_result = query_csv_resource(sql)
-
 result = raw_result["result"]["records"]
 
 
-## 5. Write the factoid based on the results.
 # %%
-factoid = "📍 Els noms masculins més comuns a Barcelona son Antonio, Jordi i José."
+## 5. Write the factoid based on the results.
+factoid, llm_usage = write_factoid(question, result)
+print(factoid)
 
 
 ## 6. Post the result to BlueSky.
