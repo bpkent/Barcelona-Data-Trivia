@@ -3,16 +3,21 @@ Main script.
 """
 
 # %%
+from pprint import pprint as pp
+
 from utils import (
-    dataset_title,
     get_dataset_metadata,
-    publish_bsky_post,
+    dataset_title,
     query_csv_resource,
-    write_factoid,
+    validate_sql,
+    publish_bsky_post,
 )
+from llm_utils import generate_sql_query, write_factoid
+
+
+# %%
 
 ## 1. Choose a dataset.
-# %%
 dataset = "cens-locals-planta-baixa-act-economica"
 
 meta = get_dataset_metadata(dataset)
@@ -29,37 +34,73 @@ table_id = resources[0]["id"]
 
 ## 2. Come up with an interesting question.
 # %%
-question = "Which neighborhoods of Barcelona have the most pharmacies?"
+question = "Which three neighborhoods of Barcelona have the most pharmacies?"
 
 
+# %%
 ## 3. Translate to SQL
+
+# Get table descriptions and notes
+description = meta["notes_translated"]["ca"]
+notes = meta["dataset_fields_description"]
+data_source = meta["fuente"]
+field_descriptions = meta["extras"]
+
+# %% Get and example row of data and the official schema.
+sql = f"""SELECT * FROM "{table_id}" LIMIT 1"""
+
+response = query_csv_resource(sql)
+example = response.json()["result"]["records"][0]
+
+
 # %%
-sql = (
-    f"""SELECT "Nom_Barri", COUNT(*) FROM "{table_id}" WHERE "Nom_Principal_Activitat" = 'Actiu' """
-    "GROUP BY 1 "
-    "ORDER BY 2 DESC "
-    "LIMIT 3"
-)
+table_info = [
+    f"Table ID: {table_id}",
+    f"Table name: {table_title}",
+    f"Table source: {data_source}",
+    f"Table description: {description}",
+    f"First row of data:\n{example}",
+    f"Field descriptions:\n{field_descriptions}",
+]
+
+table_info = "\n\n".join(table_info)
+print(table_info)
 
 
+# %%
+hints = """Pharmacies are identified by 'Codi_Activitat_2022' = 2002000."""
+
+
+# %%
+response = generate_sql_query(question, table_info, hints)
+
+llm_sql = response.output_text
+print(llm_sql)
+
+
+# %% Validate the SQL
+sql = validate_sql(llm_sql)
+print(sql)
+
+
+# %%
 ## 4. Execute the SQL against the API.
-# %%
-raw_result = query_csv_resource(sql)
-result = raw_result["result"]["records"]
+db_response = query_csv_resource(sql)
+result = db_response.json()["result"]["records"]
+pp(result)
 
-
-# %%
-## 5. Write the factoid based on the results.
-factoid, llm_usage = write_factoid(question, result)
-print(factoid)
+# %% 5. Write the factoid based on the results.
+factoid_response = write_factoid(question, result)
+print(factoid_response.output_text)
 
 
 ## 6. Post the result to BlueSky.
 # %%
-tweet_text = f"Saps que...?\n\n{factoid}\n\n"
+tweet_text = f"Saps que...?\n\n{factoid_response.output_text}\n\n"
 
-response = publish_bsky_post(tweet_text, link_url=table_url, link_title=table_title)
-
-print(response)
+bsky_response = publish_bsky_post(
+    tweet_text, link_url=table_url, link_title=table_title
+)
+print(bsky_response)
 
 # %%
