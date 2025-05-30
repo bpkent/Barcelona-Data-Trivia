@@ -4,6 +4,7 @@ Main script.
 
 # %%
 from pprint import pprint as pp
+# import llmlite; llmlite._turn_on_debug()
 
 from utils import (
     get_dataset_metadata,
@@ -12,35 +13,27 @@ from utils import (
     validate_sql,
     publish_bsky_post,
 )
-from llm_utils import generate_sql_query, write_factoid
+from llm_utils import generate_sql_query, write_factoid, strip_formatting
 
 
 # %%
 
 ## 1. Choose a dataset.
 dataset = "precipitacio-hist-bcn"
-
-meta = get_dataset_metadata(dataset)
-
-table_title = dataset_title(meta)
-table_url = f"https://opendata-ajuntament.barcelona.cat/data/ca/dataset/{dataset}"
-
-
-## 1B. Identify the right resource
-# %%
-# resources = [x for x in meta["resources"] if x["datastore_active"]]
 table_id = "5da03f48-020e-4f46-9199-a919feac2034"
 
 
 ## 2. Come up with an interesting question.
 # %%
-question = "In what year did Barcelona have the least accumulated rainfall?"
+question = "In what year did Barcelona have the least accumulated rainfall and how much rain fell that year?"
 
 
 # %%
 ## 3. Translate to SQL
 
-# Get table descriptions and notes
+meta = get_dataset_metadata(dataset)
+
+table_title = dataset_title(meta)
 description = meta["notes_translated"]["ca"]
 notes = meta["dataset_fields_description"]
 data_source = meta["fuente"]
@@ -80,6 +73,17 @@ print(llm_sql)
 sql = validate_sql(llm_sql)
 print(sql)
 
+cleaning_attempts = 0
+cleaned_sql = llm_sql
+
+while not sql and cleaning_attempts <= 3:
+    print("Stripping formatting....")
+    cleaned_sql = strip_formatting(cleaned_sql)
+    cleaning_attempts = 1
+    print(f"\nCleaned SQL\n-----\n{cleaned_sql}")
+    sql = validate_sql(cleaned_sql)
+    print(f"\nValidated SQL\n-----\n{sql}")
+
 
 # %%
 ## 4. Execute the SQL against the API.
@@ -94,7 +98,8 @@ print(factoid)
 
 ## 6. Post the result to BlueSky.
 # %%
-tweet_text = f"Saps que...?\n\n{factoid.output_text}\n\n"
+tweet_text = f"Saps que...?\n\n{factoid}\n\n"
+table_url = f"https://opendata-ajuntament.barcelona.cat/data/ca/dataset/{dataset}"
 
 bsky_response = publish_bsky_post(
     tweet_text, link_url=table_url, link_title=table_title
