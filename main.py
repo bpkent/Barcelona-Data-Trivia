@@ -18,7 +18,7 @@ from llm_utils import generate_sql_query, write_factoid
 # %%
 
 ## 1. Choose a dataset.
-dataset = "cens-locals-planta-baixa-act-economica"
+dataset = "precipitacio-hist-bcn"
 
 meta = get_dataset_metadata(dataset)
 
@@ -28,13 +28,13 @@ table_url = f"https://opendata-ajuntament.barcelona.cat/data/ca/dataset/{dataset
 
 ## 1B. Identify the right resource
 # %%
-resources = [x for x in meta["resources"] if x["datastore_active"]]
-table_id = resources[0]["id"]
+# resources = [x for x in meta["resources"] if x["datastore_active"]]
+table_id = "5da03f48-020e-4f46-9199-a919feac2034"
 
 
 ## 2. Come up with an interesting question.
 # %%
-question = "Which three neighborhoods of Barcelona have the most pharmacies?"
+question = "In what year did Barcelona have the least accumulated rainfall?"
 
 
 # %%
@@ -52,7 +52,6 @@ sql = f"""SELECT * FROM "{table_id}" LIMIT 1"""
 response = query_csv_resource(sql)
 example = response.json()["result"]["records"][0]
 
-
 # %%
 table_info = [
     f"Table ID: {table_id}",
@@ -68,13 +67,12 @@ print(table_info)
 
 
 # %%
-hints = """Pharmacies are identified by 'Codi_Activitat_2022' = 2002000."""
+hints = """"""
 
 
 # %%
-response = generate_sql_query(question, table_info, hints)
+llm_sql = generate_sql_query(question, table_info, hints)
 
-llm_sql = response.output_text
 print(llm_sql)
 
 
@@ -90,13 +88,13 @@ result = db_response.json()["result"]["records"]
 pp(result)
 
 # %% 5. Write the factoid based on the results.
-factoid_response = write_factoid(question, result)
-print(factoid_response.output_text)
+factoid = write_factoid(question, result)
+print(factoid)
 
 
 ## 6. Post the result to BlueSky.
 # %%
-tweet_text = f"Saps que...?\n\n{factoid_response.output_text}\n\n"
+tweet_text = f"Saps que...?\n\n{factoid.output_text}\n\n"
 
 bsky_response = publish_bsky_post(
     tweet_text, link_url=table_url, link_title=table_title

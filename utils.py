@@ -42,16 +42,17 @@ def publish_bsky_post(text: str, link_url: str, link_title: str = "", language="
 
 
 def validate_sql(sql: str) -> str:
-    """Validate that a SQL query string parses as proper (DuckDB) SQL."""
+    """Validate that a SQL query string parses as proper SQL."""
 
     try:
-        parsed_sql = sqlglot.parse_one(sql, dialect="duckdb")
+        parsed_sql = sqlglot.parse_one(sql)
+        return parsed_sql.sql()
     except ParseError as e:
         print(f"Invalid SQL: {e}")
     except Exception as e:
         print(f"Error during validation: {e}")
 
-    return parsed_sql.sql()
+    return None
 
 
 def get_dataset_metadata(dataset: str) -> list:

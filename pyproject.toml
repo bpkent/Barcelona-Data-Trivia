@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.52.0",
     "atproto>=0.0.61",
+    "litellm>=1.71.2",
     "openai>=1.82.0",
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",

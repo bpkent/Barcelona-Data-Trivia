@@ -1,22 +1,15 @@
-import os
-
-import anthropic
+from litellm import completion
 from dotenv import load_dotenv
-from openai import OpenAI
 
 load_dotenv()
-
-
-api_key = os.environ.get("OPENAI_API_KEY")
-client = client = OpenAI(api_key=api_key)
 
 
 def generate_sql_query(question: str, table_info: str, hints: str) -> str:
     """Translate a natural langauge question to a SQL query."""
 
-    response = client.responses.create(
-        model="gpt-4.1",
-        input=[
+    response = completion(
+        model="openai/gpt-4.1",
+        messages=[
             {
                 "role": "developer",
                 "content": (
@@ -27,6 +20,7 @@ def generate_sql_query(question: str, table_info: str, hints: str) -> str:
                     "Return only clean SQL code; do not include additional "
                     "commentary or even markdown formatting. "
                     "To identify the table in the query, use the table ID string provided."
+                    "Field names should be enclosed in quotation marks."
                 ),
             },
             {"role": "user", "content": f"Question: {question}"},
@@ -35,15 +29,15 @@ def generate_sql_query(question: str, table_info: str, hints: str) -> str:
         ],
     )
 
-    return response
+    return response.choices[0]["message"]["content"]
 
 
 def write_factoid(question: str, results: list):
     """Write a factoid based on an input question and SQL query results."""
 
-    response = client.responses.create(
-        model="gpt-4.1",
-        input=[
+    response = completion(
+        model="openai/gpt-4.1",
+        messages=[
             {
                 "role": "developer",
                 "content": (
@@ -65,4 +59,4 @@ def write_factoid(question: str, results: list):
         ],
     )
 
-    return response
+    return response.choices[0]["message"]["content"]
