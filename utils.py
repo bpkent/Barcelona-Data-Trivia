@@ -82,6 +82,16 @@ def query_csv_resource(sql_query: str):
     return response
 
 
+def query_field_details(table_id: str, field: str):
+    """Get details about a specific field."""
+
+    sql = f"""SELECT DISTINCT \"{field}\" FROM \"{table_id}\""""
+    response = query_csv_resource(sql)
+    records = response.json()["result"]["records"]
+    results = [record[field] for record in records]
+    return results
+
+
 def get_table_schema(resource_id):
     """Get schema by requesting 0 records."""
 

@@ -3,6 +3,7 @@ Main script.
 """
 
 # %%
+import json
 from pprint import pprint as pp
 # import llmlite; llmlite._turn_on_debug()
 
@@ -12,20 +13,26 @@ from utils import (
     query_csv_resource,
     validate_sql,
     publish_bsky_post,
+    query_field_details,
 )
-from llm_utils import generate_sql_query, write_factoid, strip_formatting
+from llm_utils import (
+    generate_sql_query,
+    write_factoid,
+    strip_formatting,
+    plan_schema_queries,
+)
 
 
 # %%
 
 ## 1. Choose a dataset.
-dataset = "precipitacio-hist-bcn"
-table_id = "5da03f48-020e-4f46-9199-a919feac2034"
+dataset = "est-vehicles-amb-distintiu"
+table_id = "0c93eb37-b145-4810-b8d9-17c72683eee4"
 
 
 ## 2. Come up with an interesting question.
 # %%
-question = "In what year did Barcelona have the least accumulated rainfall and how much rain fell that year?"
+question = "Which neighborhood of Barcelona had the most registered registered vehicle in 2023, not counting motorcycles or scooters?"
 
 
 # %%
@@ -55,8 +62,17 @@ table_info = [
     f"Field descriptions:\n{field_descriptions}",
 ]
 
-table_info = "\n\n".join(table_info)
-print(table_info)
+table_info_str = "\n\n".join(table_info)
+print(table_info_str)
+
+
+# %% 4. Which fields do we need more information about?
+req_fields = json.loads(plan_schema_queries(question, table_info_str))
+print(req_fields)
+
+for field in req_fields:
+    distinct_values = query_field_details(table_id, field)
+    table_info.append(f"Distinct values for field '{field}': {distinct_values}")
 
 
 # %%
@@ -64,7 +80,12 @@ hints = """"""
 
 
 # %%
-llm_sql = generate_sql_query(question, table_info, hints)
+table_info_str = "\n\n".join(table_info)
+print(table_info_str)
+
+
+# %%
+llm_sql = generate_sql_query(question, table_info_str, hints)
 
 print(llm_sql)
 

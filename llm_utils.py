@@ -12,7 +12,36 @@ router = Router(
         {"model_name": "gpt4", "litellm_params": {"model": "openai/gpt-4.1"}},
     ],
     fallbacks=[{"claude": ["gpt4"]}],
+    set_verbose=True,
+    debug_level="INFO",
 )
+
+
+def plan_schema_queries(question: str, table_info: str):
+    """Ask an LLM which fields it needs more information about to construct a correct
+    SQL query."""
+
+    response = router.completion(
+        model="claude",
+        messages=[
+            {
+                "role": "developer",
+                "content": (
+                    "You are an AI assistant ultimately tasked with generating a SQL "
+                    "query to answer questions about a PostgreSQL table, given table "
+                    "metadata, an example row of data, and descriptions of the fields. "
+                    "Your immediate task is to identify which fields, if any, you "
+                    "need more information about, to construct a correct, executable "
+                    "SQL query. "
+                    "Do not return any commentary in your response; only a JSON array of strings."
+                ),
+            },
+            {"role": "user", "content": f"Question: {question}"},
+            {"role": "user", "content": table_info},
+        ],
+    )
+
+    return response.choices[0]["message"]["content"]
 
 
 def generate_sql_query(question: str, table_info: str, hints: str) -> str:
