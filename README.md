@@ -1,3 +1,5 @@
+![Banner](./images/logo2.png)
+
 Barcelona Data Trivia
 =========
 
