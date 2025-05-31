@@ -1,2 +1,5 @@
 *.env
 __pycache__/
+raw_data/
+working_data/
+.DS_Store

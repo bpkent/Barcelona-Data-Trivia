@@ -54,14 +54,11 @@ def generate_sql_query(question: str, table_info: str, hints: str) -> str:
                 "role": "developer",
                 "content": (
                     "You are an AI assistant tasked with generating SQL queries "
-                    "to answer questions about a PostgreSQL table, given only metadata "
+                    "to answer questions about a DuckDB table, given metadata "
                     "about the table, an example row of data, descriptions of the fields, "
-                    "and potentially hints from the user about the table schema. "
-                    "To identify the table in the query, use the table ID string provided."
-                    "Field names should be enclosed in quotation marks."
-                    "Return only clean SQL code; do not use any reasoning or markdown formatting.\n"
-                    "Example output:\n"
-                    """SELECT \"Nom_Barri\" FROM \"3dce0dbd-5a7d-439a-b945-6bffc17a6c03\" LIMIT 3"""
+                    "and optional hints from the user about the table schema. "
+                    "Return only clean SQL code; do not use any reasoning or markdown formatting. "
+                    "Remember to put quotes around table names."
                 ),
             },
             {"role": "user", "content": f"Question: {question}"},
@@ -78,15 +75,17 @@ def strip_formatting(llm_sql: str) -> str:
     response."""
 
     response = router.completion(
-        model="claude",
+        model="gpt4",
         messages=[
             {
                 "role": "developer",
                 "content": (
                     "You are an AI assistant tasked with extracting completely "
                     "clean SQL code from input text. "
-                    "Your response should be pure, runnable SQL code, free of any "
-                    "commentary or markdown formatting."
+                    "Your response should be pure, executable SQL code, free of any "
+                    "commentary or markdown formatting.\n\n"
+                    "Input: ```sql\nSELECT * FROM vehicles LIMIT 10```"
+                    "Output: SELECT * FROM vehicles LIMIT 10"
                 ),
             },
             {"role": "user", "content": f"Input:\n{llm_sql}"},

@@ -45,7 +45,7 @@ def validate_sql(sql: str) -> str:
     """Validate that a SQL query string parses as proper SQL."""
 
     try:
-        parsed_sql = sqlglot.parse_one(sql)
+        parsed_sql = sqlglot.parse_one(sql, dialect="duckdb")
         return parsed_sql.sql()
     except ParseError as e:
         print(f"Invalid SQL: {e}")
@@ -68,38 +68,16 @@ def get_dataset_metadata(dataset: str) -> list:
     return []
 
 
-def dataset_title(dataset_meta: dict) -> str:
+def extract_dataset_title(dataset_meta: dict) -> str:
     """From dataset metadata, extract the website title."""
     return dataset_meta["title_translated"]["ca"]
 
 
-def query_csv_resource(sql_query: str):
-    """Query a CSV resource with SQL"""
-
-    url = f"{data_api}/datastore_search_sql"
-    params = {"sql": sql_query}
-    response = requests.get(url, params=params)
-    return response
-
-
-def query_field_details(table_id: str, field: str):
+def query_field_details(conn, table_name: str, field: str):
     """Get details about a specific field."""
 
-    sql = f"""SELECT DISTINCT \"{field}\" FROM \"{table_id}\""""
-    response = query_csv_resource(sql)
-    records = response.json()["result"]["records"]
-    results = [record[field] for record in records]
-    return results
+    sql = f"""SELECT DISTINCT \"{field}\" FROM \"{table_name}\""""
 
-
-def get_table_schema(resource_id):
-    """Get schema by requesting 0 records."""
-
-    url = f"{data_api}/datastore_search"
-    params = {
-        "resource_id": resource_id,
-        "limit": 0,  # Get structure without data
-    }
-
-    response = requests.get(url, params=params)
-    return response.json()
+    result = conn.sql(sql).fetchall()
+    result = [x[0] for x in result]
+    return result
