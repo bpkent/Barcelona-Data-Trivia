@@ -1,4 +1,6 @@
-![Banner](./images/logo2.png)
+<div align="center">
+  <img src="./images/logo2.png" alt="Logo" width="30%"/>
+</div>
 
 Barcelona Data Trivia
 =========
