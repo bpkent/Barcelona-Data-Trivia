@@ -8,10 +8,6 @@ https://bsky.app/profile/bcndatatrivia.bsky.social
 
 Big picture to do's
 -----------
-* Logo on the BSky account
-* Explanatory text on the BSky account
-    - Including that the info is AI-generated but human curated and reviewed.
-
 * LLM to generate the motivating question too.
     - What context would it need for this?
         - Examples

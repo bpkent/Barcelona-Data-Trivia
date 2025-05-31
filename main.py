@@ -32,7 +32,7 @@ table_id = "0c93eb37-b145-4810-b8d9-17c72683eee4"
 
 ## 2. Come up with an interesting question.
 # %%
-question = "Which neighborhood of Barcelona had the most registered registered vehicle in 2023, not counting motorcycles or scooters?"
+question = "Which neighborhood of Barcelona had the highest ratio of vans and trucks to personal vehicles in 2023?"
 
 
 # %%
