@@ -14,25 +14,42 @@ The goal is for this project is to be fully automated, relying heavily on LLM se
 
 Current strategy
 -------
-1. Choose an interesting dataset manually.
+Ahead of time...
 
-2. Download the dataset manually into the `raw_data` folder.
+1. Download datasets manually into the `raw_data` folder from the Open Data BCN portal.
 
-3. Create a new DuckDB persistent DB in the `working_data` folder.
-    - `$ duckdb [dataset].db`
-    - `D CREATE TABLE '[table name]' AS SELECT FROM read_csv_auto('../raw_data/[dataset].csv');`
+2. Add an entry to `datasets.yaml`.
+    - Top level is the dataset slug.
+    - Filename is whatever the CSV is called when its donwloaded.
+    - resource_id can be found in the table's URL on the Open Data BCN website.
+
+3. Create a new DuckDB persistent DB in the `working_data` folder. The table name should be identical to the filename but without the CSV extension.
+    - `$ duckdb [dataset slug].db`
+    - `D CREATE TABLE '[table name]' AS SELECT FROM read_csv_auto('../raw_data/[filename]);`
     - `D .tables`
 
-4. Run `main.py` in the VS Code interactive window. Step through the cells one-by-one.
-    - Set the motivating question manually.
-    - Get the dataset metadata from the OpenData BCN portal (this is currently the only call to the data portal).
-    - Ask the LLM which fields it needs more info about (i.e. for filtering on certain values).
-    - Query the DB for more info on those fields.
-    - Generate the final SQL query with an LLM.
-    - Clean and validate the final SQL query with `sqlglot` and an LLM.
-    - Execute the final SQL query.
-    - Use an LLM to write a factoid based on the results.
-    - Post the factoid as a BlueSky tweet.
+To generate a factoid and post it on BlueSky, run `main.py` in the VS Code interactive window. Step through the cells one-by-one.
+
+1. Choose a dataset randomly from `datasets.yaml`.
+
+2. Get the dataset metadata from the OpenData BCN portal (this is currently the only call to the data portal).
+
+3. Come up with an interesting question about the data.
+    - Currently manual. Should be automated soon.
+
+4. Ask the LLM which fields it needs more info about to answer the question (i.e. for filtering on certain values).
+
+5. Query the DB for more info on those fields.
+
+6. Generate the final SQL query with an LLM.
+
+7. Clean and validate the final SQL query with `sqlglot` and an LLM.
+
+8. Execute the final SQL query.
+
+9. Use an LLM to write a factoid based on the results.
+
+10. Post the factoid as a BlueSky tweet.
 
 
 V1 To Do's
