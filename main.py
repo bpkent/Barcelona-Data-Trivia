@@ -4,10 +4,13 @@ Main script.
 
 # %%
 import json
-# from pprint import pprint as pp
+from pathlib import Path
+import random
 
+# from pprint import pprint as pp
 # import llmlite; llmlite._turn_on_debug()
 import duckdb
+import yaml
 
 from llm_utils import (
     generate_sql_query,
@@ -23,25 +26,26 @@ from utils import (
     validate_sql,
 )
 
-# %%
+# %% 0. Read in dataset config.
+with open("datasets.yaml", "r") as f:
+    datasets = yaml.safe_load(f)
 
-## 1. Choose a dataset.
-dataset = "est-vehicles-amb-distintiu"
-table_name = "2024_parc_vehicles_distintiu_amb"
+
+# %% 1. Choose a dataset.
+dataset = random.choice(list(datasets.keys()))
+print(f"Dataset: {dataset}")
+
+table_name = Path(datasets[dataset]["filename"]).stem
+resource_id = datasets[dataset]["resource_id"]
 
 
 # %%
 ## Connect to the local DuckDB table.
-db = duckdb.connect("working_data/est-vehicles-amb-distintiu.db", read_only=True)
-
-
-## 2. Come up with an interesting question.
-# %%
-question = "Which neighborhood of Barcelona has the highest ratio of work vehicles (vans and trucks) to personal vehicles (cars and motorcycles)?"
+db = duckdb.connect(f"working_data/{dataset}.db", read_only=True)
 
 
 # %%
-## 3. Translate to SQL
+## 2. Get metadata about the chosen table.
 
 meta = get_dataset_metadata(dataset)
 
@@ -72,6 +76,14 @@ table_info = [
 
 table_info_str = "\n\n".join(table_info)
 print(table_info_str)
+
+
+### HAVE TO GO MANUAL HERE TO PICK THE QUESTION (FOR NOW) ###
+### ----------------------------------------------------- ###
+
+## 2. Come up with an interesting question.
+# %%
+question = "Which economic sector consumed the most electricity so far in 2025?"
 
 
 # %% 4. Which fields do we need more information about?
@@ -126,6 +138,9 @@ data = result.df().to_dict(orient="records")
 
 factoid = write_factoid(question, result)
 print(factoid)
+
+if len(factoid) > 275:
+    raise ValueError("Factoid is too long!")
 
 
 ## 6. Post the result to BlueSky.

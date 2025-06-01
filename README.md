@@ -39,12 +39,6 @@ V1 To Do's
 ----------
 When these items are done, it's time to show it off to the world.
 
-* Start adding the #Barcelona tag so the tweets get picked up in lists.
-
-* Check out the catalog dataset - can I use this to auto-generate interesting questions?
-
-* Download a bunch of datasets, names, example rows of data, etc.
-
 * LLM to generate the motivating question.
 
 * Run on a remote machine.
@@ -56,6 +50,20 @@ When these items are done, it's time to show it off to the world.
     
 Future To Do's
 --------------
+* Keep expanding the set of downloaded datasets.
+
+* Weight the dataset choice to prefer datasets that haven't been chosen in a while.
+    - Include a field in the YAML with last chosen timestamp and write to it (when a tweet is actually posted at the end).
+    - `random.choices` can take weights, or `numpy.choice`.
+
+* Log the runs
+    - Dataset
+    - Question
+    - SQL
+    - Results
+    - Factoid
+    - Bsky URIs
+
 * Generalize the LLM call that strips formatting from the SQL output.
     - It should get all of the information from the SQL validator, i.e. bogus table name, etc.
     - It's task should be to fix whatever the bug is.

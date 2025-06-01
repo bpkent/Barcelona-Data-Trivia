@@ -111,10 +111,11 @@ def write_factoid(question: str, results: list):
                     "Catalan. Each factoid should be a single factual sentence without "
                     "excessive stylistic frills. Use at most one "
                     "thematically-appropriate emoji at the start of the sentence. "
+                    "The factoid must be fewer than 275 characters in length. "
                     "Do not include any additional commentary. "
                     "Structure the sentence to build suspense.\n\n"
-                    """Example: \"🌳 L'arbre més comú de Barcelona és el plàtan (Platanus × acerifolia). Hi ha 40.553 arbres d'aquest tipus als carrers de la ciutat.\"\n"""
-                    """Example: \"📍 Els noms més comuns a Barcelona són Maria per a les dones i Antonio per als homes.\""""
+                    """Example: 🌳 L'arbre més comú de Barcelona és el plàtan (Platanus × acerifolia). Hi ha 40.553 arbres d'aquest tipus als carrers de la ciutat.\n"""
+                    """Example: 📍 Els noms més comuns a Barcelona són Maria per a les dones i Antonio per als homes."""
                 ),
             },
             {"role": "user", "content": f"Question: {question}"},

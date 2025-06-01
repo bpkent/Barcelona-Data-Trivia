@@ -1,0 +1,15 @@
+temperatures-hist-bcn:
+  filename: "temperaturesbcndesde1780_2024.csv"
+  resource_id: 0e3b6840-7dff-4731-a556-44fac28a7873
+
+habitatges-us-turistic:
+  filename: "hut_comunicacio_opendata.csv"
+  resource_id: b32fa7f6-d464-403b-8a02-0292a64883bf
+
+consum-electricitat-bcn:
+  filename: "2025_consum_electricitat_BCN.csv"
+  resource_id: 635923fe-9e3b-40d3-857d-aaa9a6913531
+
+allotjaments-hotels:
+  filename: "opendatabcn_allotjament_hotels-csv.csv"
+  resource_id: 9bccce1b-0b9d-4cc6-94a7-459cb99450de

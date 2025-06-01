@@ -27,7 +27,7 @@ def publish_bsky_post(text: str, link_url: str, link_title: str = "", language="
     client = Client()
     client.login(login=bsky_handle, password=bsky_passwd)
 
-    full_text = client_utils.TextBuilder().text(text).link(link_url, link_url)
+    full_text = client_utils.TextBuilder().text(text).tag("#Barcelona\n", "Barcelona")
 
     external_embed = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
@@ -74,7 +74,7 @@ def extract_dataset_title(dataset_meta: dict) -> str:
 
 
 def query_field_details(conn, table_name: str, field: str):
-    """Get details about a specific field."""
+    """Get details about a specific field in a DuckDB table."""
 
     sql = f"""SELECT DISTINCT \"{field}\" FROM \"{table_name}\""""
 
