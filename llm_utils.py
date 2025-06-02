@@ -58,7 +58,7 @@ def generate_sql_query(question: str, table_info: str, hints: str) -> str:
                     "about the table, an example row of data, descriptions of the fields, "
                     "and optional hints from the user about the table schema. "
                     "Return only clean SQL code; do not use any reasoning or markdown formatting. "
-                    "Remember to put quotes around table names."
+                    "Remember to put quotes around table and field names."
                 ),
             },
             {"role": "user", "content": f"Question: {question}"},

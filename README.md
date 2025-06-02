@@ -58,11 +58,11 @@ When these items are done, it's time to show it off to the world.
 
 * LLM to generate the motivating question.
 
+* Evaluations
+
 * Run on a remote machine.
 
 * Run with a cron scheduler.
-
-* Evaluations
 
     
 Future To Do's
@@ -80,6 +80,8 @@ Future To Do's
     - Results
     - Factoid
     - Bsky URIs
+
+* Download the resource metadata offline as well, because the OpenDataBCN API is so spotty.
 
 * Generalize the LLM call that strips formatting from the SQL output.
     - It should get all of the information from the SQL validator, i.e. bogus table name, etc.

@@ -19,7 +19,6 @@ from llm_utils import (
     write_factoid,
 )
 from utils import (
-    extract_dataset_title,
     get_dataset_metadata,
     publish_bsky_post,
     query_field_details,
@@ -32,7 +31,8 @@ with open("datasets.yaml", "r") as f:
 
 
 # %% 1. Choose a dataset.
-dataset = random.choice(list(datasets.keys()))
+# dataset = random.choice(list(datasets.keys()))
+dataset = "temperatures-hist-bcn"
 print(f"Dataset: {dataset}")
 
 table_name = Path(datasets[dataset]["filename"]).stem
@@ -49,7 +49,7 @@ db = duckdb.connect(f"working_data/{dataset}.db", read_only=True)
 
 meta = get_dataset_metadata(dataset)
 
-dataset_title = extract_dataset_title(meta)
+dataset_title = meta["title_translated"]["ca"]
 description = meta["notes_translated"]["ca"]
 notes = meta["dataset_fields_description"]
 data_source = meta["fuente"]
@@ -83,7 +83,7 @@ print(table_info_str)
 
 ## 2. Come up with an interesting question.
 # %%
-question = "Which economic sector consumed the most electricity so far in 2025?"
+question = "What was the 5-year rolling average June temperature in 2024 vs. 1785?"
 
 
 # %% 4. Which fields do we need more information about?
@@ -107,7 +107,6 @@ print(table_info_str)
 
 # %%
 llm_sql = generate_sql_query(question, table_info_str, hints)
-
 print(llm_sql)
 
 
@@ -139,13 +138,13 @@ data = result.df().to_dict(orient="records")
 factoid = write_factoid(question, result)
 print(factoid)
 
-if len(factoid) > 275:
+if len(factoid) > 273:
     raise ValueError("Factoid is too long!")
 
 
 ## 6. Post the result to BlueSky.
 # %%
-tweet_text = f"Saps que...?\n\n{factoid}\n\n"
+tweet_text = f"Sabies que...?\n\n{factoid}\n\n"
 table_url = f"https://opendata-ajuntament.barcelona.cat/data/ca/dataset/{dataset}"
 
 bsky_response = publish_bsky_post(

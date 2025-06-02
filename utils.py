@@ -68,11 +68,6 @@ def get_dataset_metadata(dataset: str) -> list:
     return []
 
 
-def extract_dataset_title(dataset_meta: dict) -> str:
-    """From dataset metadata, extract the website title."""
-    return dataset_meta["title_translated"]["ca"]
-
-
 def query_field_details(conn, table_name: str, field: str):
     """Get details about a specific field in a DuckDB table."""
 
