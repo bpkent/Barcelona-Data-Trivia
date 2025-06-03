@@ -32,7 +32,7 @@ with open("datasets.yaml", "r") as f:
 
 # %% 1. Choose a dataset.
 # dataset = random.choice(list(datasets.keys()))
-dataset = "temperatures-hist-bcn"
+dataset = "est-vehicles-amb-distintiu"
 print(f"Dataset: {dataset}")
 
 table_name = Path(datasets[dataset]["filename"]).stem
@@ -83,7 +83,7 @@ print(table_info_str)
 
 ## 2. Come up with an interesting question.
 # %%
-question = "What was the 5-year rolling average June temperature in 2024 vs. 1785?"
+question = "Which neighborhood has the highest ratio of working vehicles (trucks and vans) to personal vehicles (cars and motorcycles)?"
 
 
 # %% 4. Which fields do we need more information about?

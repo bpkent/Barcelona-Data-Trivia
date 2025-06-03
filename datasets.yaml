@@ -13,3 +13,7 @@ consum-electricitat-bcn:
 allotjaments-hotels:
   filename: "opendatabcn_allotjament_hotels-csv.csv"
   resource_id: 9bccce1b-0b9d-4cc6-94a7-459cb99450de
+
+est-vehicles-amb-distintiu:
+  filename: "2024_parc_vehicles_distintiu_amb.csv"
+  resource_id: 76f84a54-fa04-4779-814c-9c12ae219217
