@@ -20,10 +20,11 @@ Ahead of time...
 
 2. Add an entry to `datasets.yaml`.
     - Top level is the dataset slug.
+    - Title is the title on the Open Data BCN portal.
     - Filename is whatever the CSV is called when its donwloaded.
     - resource_id can be found in the table's URL on the Open Data BCN website.
 
-3. Use the CLI tool to create a new DuckDB persistent DB in the `working_data` folder. From project root, run:
+3. Run the CLI tool to do A. create a new DuckDB persistent DB and B. download and save the dataset metadata, both in the `working_data` folder. From project root, run:
     - `uv run cli.py createdb [DATASET SLUG]`
 
 To generate a factoid and post it on BlueSky, run `main.py` in the VS Code interactive window. Step through the cells one-by-one.
@@ -54,28 +55,37 @@ V1 To Do's
 ----------
 When these items are done, it's time to show it off to the world.
 
-* Return cost estimate.
+* Logging
+    - Presumably via LiteLLM plus loguru (or similar)
 
-* Cache the overall system instructions and the table info.
+* Prompt caching: cache the overall system instructions and the table info.
 
+* Online validation and evaluations
+    - `generate_sql_query` (done)
+    - `write_factoid`
+
+* Offline evaluation
+    - `generate_question`: human, rubric scoring for AI as a judge
+    - `plan_schema_queries`: human
+    - `generate_sql_query`: functional correctness
+    - `strip_formatting`: functional correctness
+    - `write_factoid`: rubric
+
+* The "get more info about a field" step could be smarter.
+    - Currently just a simple SELECT DISTINCT.
+    - Should be type, top 20 most common values, statistical summary, etc
+    
+
+Future To Do's
+--------------
 * Tune contextualization
     - Generated SQL should compute details that will add interesting detail to the question answer (e.g. "Which neighborhood consumes the most electricity?" should return both the neighbhorhood and the amount of electricity.)
-    - Instruct the factoid writer explicitly to contextualize based on table metadata in addition to the question -- the question writer shouldn't have to be so prices about times and places.
-
-* Evaluations
-
-* Guardrails?
-    - At least think about:
-        - Prompt injection
-        - Exfiltration
+    - Instruct the factoid writer explicitly to contextualize based on table metadata in addition to the question -- the question writer shouldn't have to be so precise about times and places.
 
 * Run on a remote machine.
 
 * Run with a cron scheduler.
 
-    
-Future To Do's
---------------
 * Keep expanding the set of downloaded datasets.
 
 * Weight the dataset choice to prefer datasets that haven't been chosen in a while.
@@ -89,8 +99,6 @@ Future To Do's
     - Results
     - Factoid
     - Bsky URIs
-
-* Download the resource metadata offline as well, because the OpenDataBCN API is so spotty.
 
 * Generalize the LLM call that strips formatting from the SQL output.
     - It should get all of the information from the SQL validator, i.e. bogus table name, etc.

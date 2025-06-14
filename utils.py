@@ -4,10 +4,12 @@ Utils.
 
 import os
 
+import duckdb
 import requests
 import sqlglot
 from atproto import Client, client_utils, models
 from dotenv import load_dotenv
+from pathlib import Path
 from sqlglot.errors import ParseError
 
 load_dotenv()
@@ -76,3 +78,20 @@ def query_field_details(conn, table_name: str, field: str):
     result = conn.sql(sql).fetchall()
     result = [x[0] for x in result]
     return result
+
+
+def create_db_from_csv(csv_path: Path, db_path: Path, table_name: str) -> int:
+    """"""
+
+    conn = duckdb.connect(str(db_path))
+
+    conn.execute(
+        f"CREATE TABLE '{table_name}' AS SELECT * FROM read_csv_auto('{csv_path}')"
+    )
+
+    # Get row count for confirmation
+    result = conn.execute(f"SELECT COUNT(*) FROM '{table_name}'").fetchone()
+    row_count = result[0] if result else 0
+
+    conn.close()
+    return row_count

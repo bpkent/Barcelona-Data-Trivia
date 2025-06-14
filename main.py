@@ -15,7 +15,7 @@ import yaml
 
 from llm_utils import (
     UsageTracker,
-    write_haiku,
+    # write_haiku,
     generate_question,
     generate_sql_query,
     plan_schema_queries,
@@ -23,7 +23,6 @@ from llm_utils import (
     write_factoid,
 )
 from utils import (
-    get_dataset_metadata,
     publish_bsky_post,
     query_field_details,
     validate_sql,
@@ -40,6 +39,7 @@ with open("datasets.yaml", "r") as f:
 
 
 # %% 1. Choose a dataset.
+# ------------
 # dataset = random.choice(list(datasets.keys()))
 dataset = "accidents-gu-bcn"
 print(f"Dataset: {dataset}")
@@ -49,7 +49,7 @@ resource_id = datasets[dataset]["resource_id"]
 
 
 # %% Test the usage tracker callbacks.
-haiku = write_haiku(table_name)
+# haiku = write_haiku(table_name)
 
 
 # %%
@@ -57,10 +57,10 @@ haiku = write_haiku(table_name)
 db = duckdb.connect(f"working_data/{dataset}.db", read_only=True)
 
 
-# %%
-## 2. Get metadata about the chosen table.
-
-meta = get_dataset_metadata(dataset)
+# %% 2. Get metadata about the chosen table.
+# ------------------
+with open(f"working_data/{dataset}.json", "r") as f:
+    meta = json.load(f)
 
 dataset_title = meta["title_translated"]["ca"]
 description = meta["notes_translated"]["ca"]
@@ -91,17 +91,16 @@ table_info_str = "\n\n".join(table_info)
 print(table_info_str)
 
 
-### HAVE TO GO MANUAL HERE TO PICK THE QUESTION (FOR NOW) ###
-### ----------------------------------------------------- ###
-
-## 2. Come up with an interesting question.
-# %%
-question = generate_question(table_info_str)
+## 3. Come up with an interesting question.
+## -------
+## %%
+# question = generate_question(table_info_str)
 # print(question)
-# question = "What hour of the year had the most vehicular accidents in 2024?"
+question = "What hour of the week had the most vehicular accidents in 2024?"
 
 
 # %% 4. Which fields do we need more information about?
+# ------------------
 req_fields = json.loads(plan_schema_queries(question, table_info_str))
 print(req_fields)
 
@@ -112,7 +111,8 @@ for field in req_fields:
     table_info.append(f"Distinct values for field '{field}': {distinct_values}")
 
 
-# %%
+# %% 5. Generate a SQL query to run agains the dataset.
+# --------------
 hints = """"""
 
 # %%
@@ -125,7 +125,8 @@ llm_sql = generate_sql_query(question, table_info_str, hints)
 print(llm_sql)
 
 
-# %% Validate the SQL
+# %% 6. Validate and clean the SQL query
+# --------------
 sql = validate_sql(llm_sql)
 print(sql)
 
@@ -143,11 +144,14 @@ while not sql and cleaning_attempts <= 3:
 
 
 # %%
-## 4. Execute the SQL against the API.
+## 7. Execute the SQL against the database.
+# ---------------
 result = db.sql(sql)
 result
 
-# %% 5. Write the factoid based on the results.
+
+# %% 8. Write the factoid based on the results.
+# ----------------
 data = result.df().to_dict(orient="records")
 
 factoid = write_factoid(question, result, table_info_str)
@@ -157,8 +161,8 @@ if len(factoid) > 273:
     raise ValueError("Factoid is too long!")
 
 
-## 6. Post the result to BlueSky.
-# %%
+# %% 9. Post the factoid to BlueSky.
+# --------------
 tweet_text = f"Sabies que...?\n\n{factoid}\n\n"
 table_url = f"https://opendata-ajuntament.barcelona.cat/data/ca/dataset/{dataset}"
 
@@ -167,4 +171,13 @@ bsky_response = publish_bsky_post(
 )
 print(bsky_response)
 
+
+# %% 10. Analyze LLM usage and cost
+# ---------------
+usage.to_df()
+
 # %%
+usage.summarize()
+
+# %%
+print(f"Total estimated cost: {usage.to_df()['cost_estimate'].sum()}")

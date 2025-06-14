@@ -25,3 +25,8 @@ pad_mdbas:
 accidents-gu-bcn:
   filename: 2024_accidents_gu_bcn.csv
   resource_id: 66f5e7e3-045b-4d19-b649-2eaea622ae93
+
+pad_m_cognom:
+  title: "Cognoms dels habitants de Barcelona"
+  filename: 2025_pad_m_cognom.csv
+  resource_id: b15709c5-0db2-40aa-8905-ecdcdaff1e31
