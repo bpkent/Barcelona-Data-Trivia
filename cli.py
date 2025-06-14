@@ -3,17 +3,40 @@
 from pathlib import Path
 
 import duckdb
+import json
 import typer
 import yaml
 from rich import print
 from typing_extensions import Annotated
 
+from utils import get_dataset_metadata
+
 app = typer.Typer()
 
 
-@app.callback()
-def callback():
-    pass
+@app.command()
+def pull_meta(
+    db_slug: Annotated[str, typer.Argument(help="Path for the new DuckDB database")],
+):
+    """Fetch metadata for a database and write to local file."""
+
+    metadata = get_dataset_metadata(db_slug)
+
+    meta_path = Path("raw_data") / f"{db_slug}.json"
+
+    if meta_path.exists():
+        print(f"Metadata for '{db_slug}' already exists!")
+        raise typer.Exit()
+
+    try:
+        with open(meta_path, "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        print(f"✅ Fetched and saved metadata for {db_slug} into raw_data/.")
+
+    except Exception as e:
+        typer.echo(f"Error creating database: {e}", err=True)
+        raise typer.Exit(1)
 
 
 @app.command()
