@@ -15,6 +15,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "sqlglot[rs]>=26.22.0",
+    "typer>=0.16.0",
 ]
 
 [tool.uv]

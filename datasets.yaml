@@ -17,3 +17,8 @@ allotjaments-hotels:
 est-vehicles-amb-distintiu:
   filename: "2024_parc_vehicles_distintiu_amb.csv"
   resource_id: 76f84a54-fa04-4779-814c-9c12ae219217
+
+pad_mdbas:
+  filename: 2025_pad_mdbas.csv
+  resource_id: eb82adf2-a7b0-40e6-9624-b4b9eff23018
+  

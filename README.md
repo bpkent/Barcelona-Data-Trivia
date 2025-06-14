@@ -23,10 +23,8 @@ Ahead of time...
     - Filename is whatever the CSV is called when its donwloaded.
     - resource_id can be found in the table's URL on the Open Data BCN website.
 
-3. Create a new DuckDB persistent DB in the `working_data` folder. The table name should be identical to the filename but without the CSV extension.
-    - `$ duckdb [dataset slug].db`
-    - `D CREATE TABLE '[table name]' AS SELECT FROM read_csv_auto('../raw_data/[filename]);`
-    - `D .tables`
+3. Use the CLI tool to create a new DuckDB persistent DB in the `working_data` folder. From project root, run:
+    - `uv run cli.py createdb [DATASET SLUG]`
 
 To generate a factoid and post it on BlueSky, run `main.py` in the VS Code interactive window. Step through the cells one-by-one.
 
@@ -56,9 +54,20 @@ V1 To Do's
 ----------
 When these items are done, it's time to show it off to the world.
 
-* LLM to generate the motivating question.
+* Return cost estimate.
+
+* Cache the overall system instructions and the table info.
+
+* Tune contextualization
+    - Generated SQL should compute details that will add interesting detail to the question answer (e.g. "Which neighborhood consumes the most electricity?" should return both the neighbhorhood and the amount of electricity.)
+    - Instruct the factoid writer explicitly to contextualize based on table metadata in addition to the question -- the question writer shouldn't have to be so prices about times and places.
 
 * Evaluations
+
+* Guardrails?
+    - At least think about:
+        - Prompt injection
+        - Exfiltration
 
 * Run on a remote machine.
 
