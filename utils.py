@@ -41,7 +41,7 @@ def publish_bsky_post(text: str, link_url: str, link_title: str = "", language="
     return response
 
 
-def validate_sql(sql: str) -> str:
+def validate_sql(sql: str) -> str | None:
     """Validate that a SQL query string parses as proper SQL."""
 
     try:
@@ -55,7 +55,7 @@ def validate_sql(sql: str) -> str:
     return None
 
 
-def get_dataset_metadata(dataset: str) -> list:
+def get_dataset_metadata(dataset: str) -> dict:
     """Get all metadata for a dataset, including the resources."""
 
     url = f"{data_api}/package_show"
@@ -65,7 +65,7 @@ def get_dataset_metadata(dataset: str) -> list:
     if response.json()["success"]:
         return response.json()["result"]
 
-    return []
+    return {}
 
 
 def query_field_details(conn, table_name: str, field: str):

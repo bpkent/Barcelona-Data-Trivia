@@ -21,4 +21,7 @@ est-vehicles-amb-distintiu:
 pad_mdbas:
   filename: 2025_pad_mdbas.csv
   resource_id: eb82adf2-a7b0-40e6-9624-b4b9eff23018
-  
+
+accidents-gu-bcn:
+  filename: 2024_accidents_gu_bcn.csv
+  resource_id: 66f5e7e3-045b-4d19-b649-2eaea622ae93

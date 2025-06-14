@@ -4,6 +4,7 @@ Main script.
 
 # %%
 import json
+import litellm
 from pathlib import Path
 import random
 
@@ -13,6 +14,9 @@ import duckdb
 import yaml
 
 from llm_utils import (
+    UsageTracker,
+    write_haiku,
+    generate_question,
     generate_sql_query,
     plan_schema_queries,
     strip_formatting,
@@ -25,6 +29,11 @@ from utils import (
     validate_sql,
 )
 
+
+# %% Initialize trackers
+usage = UsageTracker()
+litellm.callbacks = [usage]
+
 # %% 0. Read in dataset config.
 with open("datasets.yaml", "r") as f:
     datasets = yaml.safe_load(f)
@@ -32,11 +41,15 @@ with open("datasets.yaml", "r") as f:
 
 # %% 1. Choose a dataset.
 # dataset = random.choice(list(datasets.keys()))
-dataset = "est-vehicles-amb-distintiu"
+dataset = "accidents-gu-bcn"
 print(f"Dataset: {dataset}")
 
 table_name = Path(datasets[dataset]["filename"]).stem
 resource_id = datasets[dataset]["resource_id"]
+
+
+# %% Test the usage tracker callbacks.
+haiku = write_haiku(table_name)
 
 
 # %%
@@ -83,7 +96,9 @@ print(table_info_str)
 
 ## 2. Come up with an interesting question.
 # %%
-question = "Which neighborhood has the highest ratio of working vehicles (trucks and vans) to personal vehicles (cars and motorcycles)?"
+question = generate_question(table_info_str)
+# print(question)
+# question = "What hour of the year had the most vehicular accidents in 2024?"
 
 
 # %% 4. Which fields do we need more information about?
@@ -135,7 +150,7 @@ result
 # %% 5. Write the factoid based on the results.
 data = result.df().to_dict(orient="records")
 
-factoid = write_factoid(question, result)
+factoid = write_factoid(question, result, table_info_str)
 print(factoid)
 
 if len(factoid) > 273:
